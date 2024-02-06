@@ -4,11 +4,12 @@
 
 clearvars; clc; close all; % clearvars is better than clear all for performance (see warning for details)
 
-code_folder = 'D:\iaps_data_share\code\'; % Make sure it ends with \
-data_folder = 'D:\iaps_data_share\'; % Make sure it ends with \ and contains enc and rec folders with dataset
+code_folder = 'D:\emotional_memory_neuronal_analyses\'; % Make sure it ends with \
+data_folder = 'C:\Users\drdus\Documents\emotional_memory_neuronal_data\'; % Make sure it ends with \ and contains the enc and rec folders
 
 addpath(code_folder);
 addpath([code_folder,'fieldtrip-20220531-DF']);
+addpath([code_folder,'utils']);
 addpath(genpath([code_folder,'boundedline']));
 ft_defaults
 
@@ -58,10 +59,10 @@ end
 
 if strcmp(task,'enc') 
     paths.spikes = [data_folder,'enc\']; % Folder containing combinato output that was reformatted in Python
-    paths.pics = [paths.spikes, sprintf('results_enc_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ish_CHECK5',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'\']; % Pictures and data output stored here
+    paths.pics = [paths.spikes, sprintf('results_enc_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ishuff',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'\']; % Pictures and data output stored here
 elseif strcmp(task,'rec')
     paths.spikes = [data_folder,'rec\'];
-    paths.pics = [paths.spikes, sprintf('results_rec_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ish_CHECK5',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'\'];
+    paths.pics = [paths.spikes, sprintf('results_rec_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ishuff',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'\'];
 end
 
 subjects    = { ...
