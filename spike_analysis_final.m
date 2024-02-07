@@ -16,8 +16,8 @@ ft_defaults
 type = 'combinato_pn'; % Positive and negative waveforms - used for reading spike train data files
 
 % Uncomment the task you want to analyze
-task = 'enc'; % IAPS encoding
-% task = 'rec'; % IAPS recognition
+% task = 'enc'; % IAPS encoding
+task = 'rec'; % IAPS recognition
 
 excludeStimOnset = true; % Remove artifacts occurring +-3ms around stimulus onset and offset
 posOnly = true; % Set true to use only positive waveforms - Gets negative from P13 since it was not inverted
@@ -39,7 +39,7 @@ end
 mfr_thresh = 0.25; % Mean firing rate threshold during task for neuron to be included.
 tl = 0.2; % Lowest time to check for average rate comparison
 th = 1.5; % Highest time to check for average rate comparison
-nShuffAnova = 100; %10,000 for manuscript
+nShuffAnova = 10000; %10,000 for manuscript
 
 psthbin = 0.01; % PSTH bin size MUST CHANGE THE FIRING RATE VECTORS FOR PCA!
 t_pre_stim = 2.5;
@@ -1484,10 +1484,11 @@ end % rec
 neur_name = [sub(:).name];
 
 if strcmp(task,'enc')
-    csvfile = fullfile(paths.pics, 'encoding_trial_results_LMM.csv');
+    csvfile = fullfile(paths.pics, 'encoding_trial_results_LMM4.csv');
     fileID = fopen(csvfile,'a+');
-    fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subjNeur', 'subject', 'neur_name', 'region', 'trial', 'emoneu', 'remfor', 'baseCnts', ...
-                    'stimCnts', 'baseRate', 'stimRate','allZ','absAllZ','rawAbsAllZ'); 
+    fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subjNeur', 'subject', 'neur_name', 'region', 'trial', 'emoneu', 'remfor', 'absAllZ','rawAbsAllZ'); 
+%     fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subjNeur', 'subject', 'neur_name', 'region', 'trial', 'emoneu', 'remfor', 'baseCnts', ...
+%                     'stimCnts', 'baseRate', 'stimRate','allZ','absAllZ','rawAbsAllZ'); 
 
     for si2 = 1:length(subjects)
         emoneu = cell(1,120);
@@ -1513,8 +1514,8 @@ if strcmp(task,'enc')
             end
 
             for ti2=1:size(sub(1).baseCnts,1) % Now through all trials
-                fprintf(fileID, '%s,%s,%s,%s,%d,%s,%s,%d,%d,%f,%f,%f,%f,%f,\n',[subjects{si2}, '_', sub(si2).name{ni2}], subjects{si2}, sub(si2).name{ni2}, region, ti2, emoneu{ti2}, remfor{ti2}, sub(si2).baseCnts(ti2,ni2), ...
-                    sub(si2).stimCnts(ti2,ni2), sub(si2).baseRate(ti2,ni2), sub(si2).stimRate(ti2,ni2), sub(si2).allZ(ti2,ni2), sub(si2).absallZ(ti2,ni2), sub(si2).rawabsallZ(ti2,ni2)); 
+                fprintf(fileID, '%s,%s,%s,%s,%d,%s,%s,%f,%f,\n',[subjects{si2}, '_', sub(si2).name{ni2}], subjects{si2}, sub(si2).name{ni2}, region, ti2, emoneu{ti2}, remfor{ti2}, ...
+                    sub(si2).absallZ(ti2,ni2), sub(si2).rawabsallZ(ti2,ni2)); 
             end
         end
     end
@@ -1522,10 +1523,11 @@ if strcmp(task,'enc')
 
 elseif strcmp(task,'rec')
     
-    csvfile = fullfile(paths.pics, 'recognition_trial_results_LMM.csv');
+    csvfile = fullfile(paths.pics, 'recognition_trial_results_LMM3.csv');
     fileID = fopen(csvfile,'a+');
-    fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subjNeur','subject', 'neur_name', 'region', 'trial', 'emoneu', 'remfor', 'baseCnts', ...
-                    'stimCnts', 'baseRate', 'stimRate', 'allZ', 'absAllZ', 'rawAbsAllZ');
+    fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subjNeur', 'subject', 'neur_name', 'region', 'trial', 'emoneu', 'remfor', 'absAllZ','rawAbsAllZ'); 
+%     fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subjNeur','subject', 'neur_name', 'region', 'trial', 'emoneu', 'remfor', 'baseCnts', ...
+%                     'stimCnts', 'baseRate', 'stimRate', 'allZ', 'absAllZ', 'rawAbsAllZ');
 
     for si2 = 1:length(subjects)
         emoneu = cell(1,240);
@@ -1553,8 +1555,8 @@ elseif strcmp(task,'rec')
             end
 
             for ti2=1:size(sub(si2).baseCnts,1) % Now through all trials
-                fprintf(fileID, '%s,%s,%s,%s,%d,%s,%s,%d,%d,%f,%f,%f,%f,%f,\n',[subjects{si2}, '_', sub(si2).name{ni2}],subjects{si2}, sub(si2).name{ni2}, region, ti2, emoneu{ti2}, remfor{ti2}, sub(si2).baseCnts(ti2,ni2), ...
-                    sub(si2).stimCnts(ti2,ni2), sub(si2).baseRate(ti2,ni2), sub(si2).stimRate(ti2,ni2), sub(si2).allZ(ti2,ni2), sub(si2).absallZ(ti2,ni2), sub(si2).rawabsallZ(ti2,ni2)); 
+                fprintf(fileID, '%s,%s,%s,%s,%d,%s,%s,%f,%f,\n',[subjects{si2}, '_', sub(si2).name{ni2}],subjects{si2}, sub(si2).name{ni2}, region, ti2, emoneu{ti2}, remfor{ti2}, ...
+                    sub(si2).absallZ(ti2,ni2), sub(si2).rawabsallZ(ti2,ni2)); 
             end
         end
     end
