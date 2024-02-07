@@ -1,0 +1,171 @@
+---
+title: "LMM_Analysis_Final"
+author: "Robin Hellerstedt"
+date: "2024-02-01"
+output:
+  html_document: 
+    toc: TRUE
+    toc_float: TRUE
+    number-sections: TRUE
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include=FALSE}
+#oo <- options(repos = "https://cran.r-project.org/")
+#install.packages("Matrix")
+#install.packages("lme4")
+#options(oo)
+
+#install.packages("lme4", type = "source")
+
+# install.packages("lmer")
+#install.packages("lme4")
+#install.packages("readr")
+#install.packages("tidyverse")
+#install.packages("ggplot2")
+#install.packages("ggbeeswarm")
+#install.packages("Rmisc")
+#install.packages("here")
+#install.packages("afex")
+#install.packages("emmeans")
+#install.packages("lmerTest")
+#install.packages("optimx")
+#install.packages("kableExtra")
+#install.packages("here")
+#install.packages("broom")
+#install.packages("lsr")
+#install.packages("effectsize")
+#install.packages("car")
+
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(ggbeeswarm)
+library(Rmisc)
+library(here)
+library(afex)
+library(emmeans)
+library(lme4)
+library(lmerTest)
+library(optimx)
+library(kableExtra)
+library(here)
+library(broom)
+library(lsr)
+library(effectsize)
+library(car)
+```
+
+```{r import data, include=FALSE}
+DataEncoding <- read_csv(here::here("C:/Users/drdus/Documents/emotional_memory_neuronal_data/enc","encoding_trial_results_LMM_final.csv"))
+DataRecognition <- read_csv(here::here("C:/Users/drdus/Documents/emotional_memory_neuronal_data/rec","recognition_trial_results_LMM_final.csv"))
+
+# Delete trials/rows with NA in remfor column (due to either not having a response in test or to have responded know which we exclude)
+DataEncoding <- DataEncoding %>% 
+  filter(!is.na(remfor))
+
+DataRecognition <- DataRecognition %>% 
+  filter(!is.na(remfor))
+
+# `Recode the  memory column without the emotion information
+DataEncoding <- DataEncoding %>% 
+  dplyr::mutate(memory = dplyr::recode(remfor,
+    "eF" = "F",
+    "nF" = "F",
+    "eR" = "R",
+    "nR" = "R",
+    "eK"  = "K",
+    "nK"  = "K"))
+
+DataRecognition <- DataRecognition %>% 
+  dplyr::mutate(memory = dplyr::recode(remfor,
+    "eRHit" = "RHit",
+    "nRHit" = "RHit",
+    "eCR" = "CR",
+    "nCR" = "CR",
+    "eM" = "M",
+    "nM" = "M",
+    "eKHit" = "K",
+    "nKHit" = "K"))
+```
+
+## Encoding R vs F
+
+### rawAbsAllZ
+
+```{r r vs f encoding rawAbsAllZ, echo=FALSE}
+DataEncodingRF <- DataEncoding %>% 
+  dplyr::filter(memory == "R" | memory == "F")
+
+DataEncodingRF$emoneu <- as.factor(DataEncodingRF$emoneu)
+DataEncodingRF$memory <- as.factor(DataEncodingRF$memory)
+
+contrasts(DataEncodingRF$emoneu) <- contr.sum(levels(DataEncodingRF$emoneu))
+contrasts(DataEncodingRF$memory) <- contr.sum(levels(DataEncodingRF$memory))
+
+EncodingLMMSubjectNeuronRFrawAbsAllZ <-lme4::lmer(rawAbsAllZ ~ 1 + emoneu * memory + (1|subject/subjNeur), data = DataEncodingRF)
+
+car::Anova(EncodingLMMSubjectNeuronRFrawAbsAllZ, type = 3)
+
+```
+
+```{r Follow up memory x emotion interaction rawAbsAllZ, echo=FALSE}
+
+EmotionMemoryInteractionRFrawAbsAllZ <- emmeans(EncodingLMMSubjectNeuronRFrawAbsAllZ, ~ memory|emoneu, lmer.df = "asymp") # Calculate emmeans
+
+pairs(EmotionMemoryInteractionRFrawAbsAllZ, adjust = "fdr") # Note that correction makes no difference in 2x2 design as there is only one test "per family", but this is how to control for unplanned follow up tests in more complex designs
+
+```
+
+### absAllZ
+
+```{r r vs f encoding absAllZ, echo=FALSE}
+
+EncodingLMMSubjectNeuronRFabsAllZ <-lme4::lmer(absAllZ ~ 1 + emoneu * memory + (1|subject/subjNeur), data = DataEncodingRF)
+
+car::Anova(EncodingLMMSubjectNeuronRFabsAllZ, type = 3)
+
+```
+
+```{r Follow up memory x emotion interaction absAllZ, echo=FALSE}
+
+EmotionMemoryInteractionRFabsAllZ <- emmeans(EncodingLMMSubjectNeuronRFabsAllZ, ~ memory|emoneu, lmer.df = "asymp") # Calculate emmeans
+
+pairs(EmotionMemoryInteractionRFabsAllZ, adjust = "fdr") # Note that correction makes no difference in 2x2 design as there is only one test "per family", but this is how to control for unplanned follow up tests in more complex designs
+
+```
+
+## Recognition, Remember vs Miss vs Correct Rejection
+
+### rawAbsAllZ
+
+```{r Recognition R vs M vs CR rawAbsAllZ, echo=FALSE}
+DataRecognitionHitMCR <- DataRecognition %>% 
+  dplyr::filter(memory == "RHit" | memory == "M" | memory == "CR")
+
+DataRecognitionHitMCR$emoneu <- as.factor(DataRecognitionHitMCR$emoneu)
+DataRecognitionHitMCR$memory <- as.factor(DataRecognitionHitMCR$memory)
+
+contrasts(DataRecognitionHitMCR$emoneu) <- contr.sum(levels(DataRecognitionHitMCR$emoneu))
+contrasts(DataRecognitionHitMCR$memory) <- contr.sum(levels(DataRecognitionHitMCR$memory))
+
+# Conduct an LMM for recognition with only neuron as random effect with random intercept
+RecogntionHitMCRrawAbsAllZ <-lme4::lmer(rawAbsAllZ ~ 1 + emoneu * memory + (1|subject/subjNeur), data = DataRecognitionHitMCR)
+
+car::Anova(RecogntionHitMCRrawAbsAllZ, type = 3) 
+
+```
+
+### absAllZ
+
+```{r Recognition R vs M vs CR absAllZ, echo=FALSE}
+# Conduct an LMM for recognition with only neuron as random effect with random intercept
+RecogntionHitMCRabsAllZ <-lme4::lmer(absAllZ ~ 1 + emoneu * memory + (1|subject/subjNeur), data = DataRecognitionHitMCR)
+
+car::Anova(RecogntionHitMCRabsAllZ, type = 3) 
+
+```
