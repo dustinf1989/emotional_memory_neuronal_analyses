@@ -117,13 +117,14 @@ for iSub = 1:size(subjects, 1)
 
             %% Align spike data with event and ncs data
             if exist(file,'file') % When no spikes are detected, there is no file in the folder
-                spike = ft_read_spike(file,'spikeformat',type); % wave_clus: Timesteps are in ms, starting at zero already?
+                spike = ft_read_spike(file,'spikeformat',type); % Spike times are saved by NeuraLynx in nanoseconds!
                 if length(spike.label) > 0
                     for i=1:length(spike.unit)
-                        spike.times_us{i} = spike.timestamp{i}.*1000 - double(hdr.FirstTimeStamp); % in us
+                        % Convert timestamps to seconds & start first recorded timestamp at zero
+                        spike.times_us{i} = spike.timestamp{i}.*1000 - double(hdr.FirstTimeStamp); % in us. Subtract the first Timestamp to make the time axis start at zero
                         spike.time{i} = spike.times_us{i} ./ 1000000; % in seconds
                         spike.timestamp{i} = spike.time{i}; % seconds, default in some fieldtrip functions
-                        spike.trial{i} = zeros(size(spike.time{i}));
+                        spike.trial{i} = zeros(size(spike.time{i})); % Which trial did the spike occur? Populated below
                     end
     
                     % Remove spikes at almost exact the stimulus presentation time because these are artifacts.
@@ -144,12 +145,13 @@ for iSub = 1:size(subjects, 1)
                         end
                     end
                     
-                    % Convert timestamps to seconds & start first recorded timestamp at zero
+                    % Create this to get the mean firing rate over the entire task
                     spike_notrials = spike;
                     for i=1:length(spike_notrials.label)
                         spike_notrials.trial{i} = ones(1,length(spike_notrials.time{i}));
                     end
                     
+                    % Save the trial ID for each spike
                     for si = 1:length(spike.time) % Number of units
                         for i = 1:length(trl)
                             q = (spike.time{si} > trl_sec(i,1) & spike.time{si} < trl_sec(i,2)); % Used to index
@@ -160,7 +162,7 @@ for iSub = 1:size(subjects, 1)
                     % Trial structure for spikes: If trials are overlapping, looks like spikes are duplicated so don't get MFR based on this.
                     cfg          = [];
                     cfg.trl = trl_sec; % Use it in seconds and avoid conversion below
-                    cfg.timestampspersecond =  1; %spike.hdr.sr; 
+                    cfg.timestampspersecond =  1; % Use one so we can do this calculation in seconds not samples
                     spikeTrials = ft_spike_maketrials(cfg,spike);
                   
                     for k=1:length(spike.unit)

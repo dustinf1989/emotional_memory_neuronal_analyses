@@ -167,7 +167,7 @@ switch spikeformat
       spike.waveform{cn}(1,:,:) = spikes(unit_idx,:)';
       spike.unit{cn}            = group_times(unit_idx,2)';
     end
-    fprintf('note that combinato timestamps are typically expressed in millisec and not in samples\n')
+    fprintf('Timestamps from NeuraLynx data are in microseconds\n')
 
  case 'combinato_pn'
 %     load(filename, 'class_times', 'spikes'); % load the mat file
@@ -213,7 +213,7 @@ switch spikeformat
       spike.unit{cn}            = neg_group_times(unit_idx,2)';
     end
 
-    fprintf('note that combinato timestamps are typically expressed in millisec and not in samples\n')
+    fprintf('Timestamps from NeuraLynx data are in microseconds\n')
 
    case 'osort'
     load(filename)
