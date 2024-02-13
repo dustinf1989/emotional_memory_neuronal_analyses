@@ -6,9 +6,13 @@ data_folder = 'C:\Users\drdus\Documents\emotional_memory_neuronal_data\'; % Make
 addpath([code_folder,'dPCA_DF']);
 folder = [data_folder,'rec\'];
 
-toA = {'all'}; %,'noHPC', 'noAmyg', 'noEC'};  % Use these options and includeKnow for SFig. 4
+toA = {'all'};  % Use this optin and includeKnow = false for Fig. 4
+% toA = {'all','noHPC', 'noAmyg', 'noEC'};  % Use these options and includeKnow for SFig. 4
 
 includeKnow = false; % Set true for SFig. 4
+
+% This saves the optimalLambda values calculated in the top section.
+oL = zeros(1,length(toA)); % optimalLamba = 1.0e-03 * [ 0.3325    0.7482    0.3325    0.4988] for {'all','noHPC', 'noAmyg', 'noEC'}
 
 for ia = 1 :length(toA)
 
@@ -72,13 +76,13 @@ for ia = 1 :length(toA)
     
     %% Cross-validation to find lambda 
     
-    % This produces optimalLambda = 3.3253e-04
+    % This produces optimalLambda = 3.3253e-04 without know for all neurons. Other values of optimalLambda will slightly change the results.
     optimalLambda = dpca_optimizeLambda(firingRatesAverage, firingRates, trialNum, ...
         'combinedParams', combinedParams, ...   
         'numComps', [10 10 10 10], ...
-        'numRep', 10, ...
+        'numRep', 500, ...
         'filename', 'tmp_optimalLambdas.mat');
-    optimalLambda
+    oL(ia) = optimalLambda;
 
     %% dPCA (with regularization and noise cov)
     
@@ -112,10 +116,6 @@ for ia = 1 :length(toA)
         explVar = dpca_explainedVariance_PCAPlots_REC_RvMvCR(firingRatesAverage, W, V, time, timeEvents, ...
              'combinedParams', combinedParams, ...
              'Cnoise', Cnoise, 'numOfTrials', trialNum);
-
-%         explVar1 = dpca_explainedVariance(firingRatesAverage, W, V,  ...
-%              'combinedParams', combinedParams, ...
-%              'Cnoise', Cnoise, 'numOfTrials', trialNum);
 
         saveas(gcf(), [folder, sprintf('_rec_PCA_%s_%ineurons.svg',ayType, length(subjMaskFiltered))]);
         exportgraphics(gcf(), [folder, sprintf('_rec_PCA_%s_%ineurons.png',ayType, length(subjMaskFiltered))]);
@@ -188,7 +188,7 @@ if ~includeKnow && strcmp(toA{ia},'all')
     
     marg = 1;
     num = 1;
-    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3));
+    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
     C = squeeze(accuracy(marg,num,:)) > B;
     CI95_dPC1 = C(:,end-25)'; 
     
@@ -260,6 +260,8 @@ if ~includeKnow && strcmp(toA{ia},'all')
         marg = mi(i);
         
         subplot(4, 3, si(i)); hold on;
+
+        % Sort the shuffled accuracies so we can get p-values
         B = squeeze(sort(accuracyShuffle(marg,:,1:end),3));
         C = squeeze(accuracy(marg,num,:)) > B;
         

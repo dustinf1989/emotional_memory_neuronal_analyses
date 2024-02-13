@@ -167,7 +167,7 @@ switch spikeformat
       spike.waveform{cn}(1,:,:) = spikes(unit_idx,:)';
       spike.unit{cn}            = group_times(unit_idx,2)';
     end
-    fprintf('Timestamps from NeuraLynx data are in microseconds\n')
+    fprintf('Timestamps from NeuraLynx data are in nanoseconds\n')
 
  case 'combinato_pn'
 %     load(filename, 'class_times', 'spikes'); % load the mat file

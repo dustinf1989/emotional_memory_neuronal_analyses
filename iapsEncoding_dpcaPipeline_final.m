@@ -6,9 +6,13 @@ data_folder = 'C:\Users\drdus\Documents\emotional_memory_neuronal_data\'; % Make
 addpath([code_folder,'dPCA_DF']);
 folder = [data_folder,'enc\'];
 
-toA = {'all'}; %,'noHPC', 'noAmyg', 'noEC'}; 
+toA = {'all'};  % Use this optin and includeKnow = false for Fig. 4
+% toA = {'all','noHPC', 'noAmyg', 'noEC'};  % Use these options and includeKnow for SFig. 4
 
-includeKnow = false;
+includeKnow = true; % Set true for SFig. 4
+
+% This saves the optimalLambda values calculated in the top section.
+oL = zeros(1,length(toA)); % optimalLamba = [0.0007    0.0007    0.0007    0.0011] for {'all','noHPC', 'noAmyg', 'noEC'}
 
 for ia = 1 :length(toA)
 
@@ -72,11 +76,13 @@ for ia = 1 :length(toA)
     
     %% Cross-validation to find lambda 
     
-    % optimalLambda = 4.9879e-04 (If this gives a different number then results can be different)
+    % optimalLambda = 4.9879e-04 (If this gives a different number then results/percentages can be different)
     optimalLambda = dpca_optimizeLambda(firingRatesAverage, firingRates, trialNum, ...
         'combinedParams', combinedParams, ... 
-        'numRep', 10, ...
-        'filename', 'tmp_optimalLambdas.mat'); 
+        'numRep', 500, ...
+        'filename', 'tmp_optimalLambdas.mat');
+    oL(ia) = optimalLambda; % Save optimalLambda values
+
     
     %% dPCA (with regularization and noise cov)
     
@@ -185,17 +191,17 @@ if ~includeKnow && strcmp(toA{ia},'all')
     
     num = 1; % always the first dPC (first column)
     marg = 1;
-    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3));
+    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
     C = squeeze(accuracy(marg,num,:)) > B;
     CI95_dPC4 = C(:,end-25)'; % Set the signifiance level where p<0.025 for the first column if using 1000 shuffled (25/1000 = 0.025)
     
     marg = 2;
-    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3));
+    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
     C = squeeze(accuracy(marg,num,:)) > B;
     CI95_dPC2 = C(:,end-25)'; 
     
     marg = 4;
-    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3));
+    B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
     C = squeeze(accuracy(marg,num,:)) > B;
     CI95_dPC3 = C(:,end-25)'; 
     
@@ -257,7 +263,7 @@ if ~includeKnow && strcmp(toA{ia},'all')
         marg = mi(i);
         
         subplot(4, 3, si(i)); hold on;
-        B = squeeze(sort(accuracyShuffle(marg,:,1:end),3));
+        B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
         C = squeeze(accuracy(marg,num,:)) > B;
         
         sh_time = time(1:size(accuracyShuffle, 2));
