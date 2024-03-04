@@ -9,12 +9,15 @@
 %%% used for this part. which_e/n is used to write "encode_list"
 %%% IAPS_enc is a randomisation of these stimuli (cogent uses IAPS_enc to
 %%% index encode_list during encoding)
+%%%
+%%% Originally written by Manuela Costa, adapted by Dustin Fetterhoff
 
 clearvars; close all; clc
 
-data_folder = 'C:\Users\drdus\Documents\emotional_memory_neuronal_data\';
+% Change this path to the data directory - Nothing else should need to be changed
+data_folder = 'C:/Users/drdus/emotional_memory_neuronal_data/';
 
-all = load(fullfile(data_folder,'images\all_images.txt')); %ALL STIMULI 1st 80 emotional; IAPS codes
+all = load(fullfile(data_folder,'images/all_images.txt')); %ALL STIMULI 1st 80 emotional; IAPS codes
  
 % Uncomment one of the below to select the desired subject numbers
 % subjects = [1 5 6 8 13]; % To get stats for only subjects with neuronal data (Not reported)
@@ -24,8 +27,8 @@ numberofsubjects = size(subjects,2);
 
 for isub=1:length(subjects)
     sub = subjects(isub);
-    enc_dir=['C:\Users\drdus\Documents\emotional_memory_neuronal_data\enc\Patient',num2str(sub),'\Enc\'];
-    rec_dir=['C:\Users\drdus\Documents\emotional_memory_neuronal_data\rec\Patient',num2str(sub),'\Rec\'];
+    enc_dir=[data_folder,'/enc/Patient',num2str(sub),'/Enc/'];
+    rec_dir=[data_folder,'/rec/Patient',num2str(sub),'/Rec/'];
 
     encode_list = load([enc_dir,'encode_list.txt']); %list of 120 IAPS image numbers
     load([enc_dir,'IAPS_enc.mat']); %% IAPS_enc is length 120; E items are 1:40, N from 41:120... which pertains to their position in Encode_List.txt
@@ -154,13 +157,6 @@ eR_dprime = dprime(recog(:,3), recog(:,4)); % d'prime: eR - eRFA
 PR_nR = recog(:,9)-recog(:,10); %PR: nR - nRFA
 nR_dprime = dprime(recog(:,9), recog(:,10)); % d'prime: nR - nRFA
 
-%% 2x2 ANOVA
-data = table([1:size(recog,1)].',recog(:,3), recog(:,4), recog(:,9), recog(:,10), 'VariableNames', {'id', 'eRHit', 'eRFA', 'nRHit', 'nRFA'});
-w = table(categorical([1 1 2 2].'), categorical([1 2 1 2].'), 'VariableNames', {'Stimulus', 'Memory'}); % within-desing
-disp(data)
-rm = fitrm(data, 'nRFA-eRHit ~ 1', 'WithinDesign', w);
-ranova(rm, 'withinmodel', 'Stimulus*Memory')
-
 [~,p_PR_nR,~,~] = ttest(PR_nR); % Is the percent correct above chance level (Above zero) for emotional remember vs false alarms?
 
 [~,p_PR_eR,~,~] = ttest(PR_eR); % Is the percent correct above chance level (Above zero) for neutral remember vs false alarms?
@@ -168,7 +164,7 @@ ranova(rm, 'withinmodel', 'Stimulus*Memory')
 [~,p_eRFA_nRFA,~,~] = ttest(recog(:,4), recog(:,10)); % eRFA vs nRFA
 
 %% Write to csv file
-csvfile = [data_folder,'\Table_S1_number_of_response_types.csv'];
+csvfile = [data_folder,'/Table_S1_number_of_response_types.csv'];
 fileID = fopen(csvfile,'a+');
 fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subject', string(namesTr));
 for i=1:length(subjects)
@@ -177,10 +173,18 @@ end
 fclose(fileID);
 
 %% Write to csv file
-csvfile = [data_folder,'\Table_S2_behavioral_performance.csv'];
+csvfile = [data_folder,'/Table_S2_behavioral_performance.csv'];
 fileID = fopen(csvfile,'a+');
 fprintf(fileID, '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\n', 'subject', names{1}, names{2},'PR_all','dR-all',names{3}, names{4},'ePR','deR',names{9}, names{10},'nPR','dnR');
 for i=1:length(subjects)
     fprintf(fileID, '%s,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,\n', sprintf('Patient%d',subjects(i)), recog(i,1),recog(i,2),PR_all(i),R_dprime(i),recog(i,3),recog(i,4),PR_eR(i),eR_dprime(i), recog(i,9),recog(i,10),PR_nR(i),nR_dprime(i));
 end
 fclose(fileID);
+
+%% 2x2 ANOVA - Requires Statistics and Machine Learning Toolbox
+% Used for stats in supplementary material
+data = table([1:size(recog,1)].',recog(:,3), recog(:,4), recog(:,9), recog(:,10), 'VariableNames', {'id', 'eRHit', 'eRFA', 'nRHit', 'nRFA'});
+w = table(categorical([1 1 2 2].'), categorical([1 2 1 2].'), 'VariableNames', {'Stimulus', 'Memory'}); % within-desing
+disp(data)
+rm = fitrm(data, 'nRFA-eRHit ~ 1', 'WithinDesign', w);
+ranova(rm, 'withinmodel', 'Stimulus*Memory')
