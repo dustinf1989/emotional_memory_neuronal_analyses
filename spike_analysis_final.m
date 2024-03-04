@@ -113,7 +113,7 @@ for iSub = 1:size(subjects, 1)
             end
 
             file = strcat(data_folder, spike_folders(iFile).name,'/py_spikes_posneg_',spike_folders(iFile).name,'.mat');
-            load([data_folder,'ft_trial_',subjects{iSub},'.mat']); % file contains 4 variables: 'event','hdr','trl','trl_sec'
+            load([data_folder,'ft_trial_final_',subjects{iSub},'.mat']); % file contains 4 variables: 'event','hdr','trl','trl_sec'
 
             %% Align spike data with event and ncs data
             if exist(file,'file') % When no spikes are detected, there is no file in the folder
