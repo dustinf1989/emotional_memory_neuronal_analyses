@@ -1,10 +1,10 @@
 clearvars; clc; close all;
 
-code_folder = 'D:\emotional_memory_neuronal_analyses\'; % Make sure it ends with \
-data_folder = 'C:\Users\drdus\Documents\emotional_memory_neuronal_data\'; % Make sure it ends with \ and contains the enc and rec folders
+code_folder = 'C:/Users/drdus/emotional_memory_neuronal_analyses/'; % Make sure it ends with /
+data_folder = 'C:/Users/drdus/emotional_memory_neuronal_data/'; % Make sure it ends with / and contains the enc and rec folders
 
 addpath([code_folder,'dPCA_DF']);
-folder = [data_folder,'rec\'];
+folder = [data_folder,'rec/'];
 
 toA = {'all'};  % Use this optin and includeKnow = false for Fig. 4
 % toA = {'all','noHPC', 'noAmyg', 'noEC'};  % Use these options and includeKnow for SFig. 4

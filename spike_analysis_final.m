@@ -4,8 +4,8 @@
 
 clearvars; clc; close all; % clearvars is better than clear all for performance (see warning for details)
 
-code_folder = 'D:\emotional_memory_neuronal_analyses\'; % Make sure it ends with \
-data_folder = 'C:\Users\drdus\Documents\emotional_memory_neuronal_data\'; % Make sure it ends with \ and contains the enc and rec folders
+code_folder = 'C:/Users/drdus/emotional_memory_neuronal_analyses/'; % Make sure it ends with / (both / and \ shoudl work on windows)
+data_folder = 'C:/Users/drdus/emotional_memory_neuronal_data/'; % Make sure it ends with / and contains the enc and rec folders
 
 addpath(code_folder);
 addpath([code_folder,'fieldtrip-20220531-DF']);
@@ -58,11 +58,11 @@ elseif strcmp(task,'enc')
 end
 
 if strcmp(task,'enc') 
-    paths.spikes = [data_folder,'enc\']; % Folder containing combinato output that was reformatted in Python
-    paths.pics = [paths.spikes, sprintf('results_enc_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ishuff',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'\']; % Pictures and data output stored here
+    paths.spikes = [data_folder,'enc/']; % Folder containing combinato output that was reformatted in Python
+    paths.pics = [paths.spikes, sprintf('results_enc_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ishuff',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'/']; % Pictures and data output stored here
 elseif strcmp(task,'rec')
-    paths.spikes = [data_folder,'rec\'];
-    paths.pics = [paths.spikes, sprintf('results_rec_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ishuff',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'\'];
+    paths.spikes = [data_folder,'rec/'];
+    paths.pics = [paths.spikes, sprintf('results_rec_%0.1fs_to_%0.1fs_%0.2fmfr_%dtrials_%0.2fbinsize_%ishuff',tl,th,mfr_thresh,thr_trials,psthbin,nShuffAnova),'/'];
 end
 
 subjects    = { ...
@@ -82,7 +82,7 @@ sp = 0; % Spike Index for saving all of them in one structure
 %% loop through subjects
 for iSub = 1:size(subjects, 1)
     ni = 0; % Neuron index
-    data_folder = strcat(paths.spikes, subjects{iSub, 1},'\');
+    data_folder = strcat(paths.spikes, subjects{iSub, 1},'/');
 
     if strcmp(task,'enc')
         load(strcat(data_folder,'enc_onsets_v2.mat')); % load trial type outcomes
@@ -112,7 +112,7 @@ for iSub = 1:size(subjects, 1)
                 s1 = [s1, t{ii(i)}, '_']; % Electrode string names
             end
 
-            file = strcat(data_folder, spike_folders(iFile).name,'\py_spikes_posneg_',spike_folders(iFile).name,'.mat');
+            file = strcat(data_folder, spike_folders(iFile).name,'/py_spikes_posneg_',spike_folders(iFile).name,'.mat');
             load([data_folder,'ft_trial_',subjects{iSub},'.mat']); % file contains 4 variables: 'event','hdr','trl','trl_sec'
 
             %% Align spike data with event and ncs data
