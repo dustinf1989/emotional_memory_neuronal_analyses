@@ -4,12 +4,14 @@ code_folder = 'C:/Users/drdus/emotional_memory_neuronal_analyses/'; % Make sure 
 data_folder = 'C:/Users/drdus/emotional_memory_neuronal_data/'; % Make sure it ends with / and contains the enc and rec folders
 
 addpath([code_folder,'dPCA_DF']);
+addpath([code_folder,'utils']);
 folder = [data_folder,'enc/'];
 
-toA = {'all'};  % Use this optin and includeKnow = false for Fig. 4
+% This is setup to create Figure 3
+toA = {'all'};  % Use this optin and includeKnow = false for Fig. 3
 % toA = {'all','noHPC', 'noAmyg', 'noEC'};  % Use these options and includeKnow for SFig. 4
 
-includeKnow = true; % Set true for SFig. 4
+includeKnow = false; % Set true for SFig. 4
 
 % This saves the optimalLambda values calculated in the top section.
 oL = zeros(1,length(toA)); % optimalLamba = [0.0007    0.0007    0.0007    0.0011] for {'all','noHPC', 'noAmyg', 'noEC'}
@@ -171,7 +173,7 @@ if ~includeKnow && strcmp(toA{ia},'all')
         'decodingClasses', decodingClasses, ...
         'noiseCovType', 'pooled', ...
         'numRep', 1000, ...        % increase to 1000
-        'filename', 'tmp_classification_accuracy.mat');
+        'filename', 'tmp_classification_accuracy_1000.mat'); % numShuffles = 1000
     
     % with 100 iterations and 100 shuffles this takes 100 times longer than the
     % above function, i.e. 17*100/60 = 28 hours (on my laptop). Be careful.
@@ -183,12 +185,13 @@ if ~includeKnow && strcmp(toA{ia},'all')
         'noiseCovType', 'pooled', ...
         'numRep', 100, ...        % increase to 100
         'numShuffles', 1000, ...  % increase to 1000 (takes a lot of time)
-        'filename', 'tmp_classification_accuracy_200.mat');
+        'filename', 'tmp_classification_accuracy_shuffle_1000.mat'); % numShuffles = 1000
     % toc
     
     % Get the component significance
     componentsSignif = dpca_signifComponents(accuracy, accuracyShuffle, whichMarg);
     
+    % The rest of the code is based on 1000 shuffles and you need to edit the selection if you use a different number of shuffles
     num = 1; % always the first dPC (first column)
     marg = 1;
     B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
@@ -198,12 +201,12 @@ if ~includeKnow && strcmp(toA{ia},'all')
     marg = 2;
     B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
     C = squeeze(accuracy(marg,num,:)) > B;
-    CI95_dPC2 = C(:,end-25)'; 
+    CI95_dPC2 = C(:,end-25)'; % Set the signifiance level where p<0.025 for the first column if using 1000 shuffled (25/1000 = 0.025)
     
     marg = 4;
     B = squeeze(sort(accuracyShuffle(marg,:,1:end),3)); % Sort the shuffled accuracies so we can get p-values
     C = squeeze(accuracy(marg,num,:)) > B;
-    CI95_dPC3 = C(:,end-25)'; 
+    CI95_dPC3 = C(:,end-25)';  % Set the signifiance level where p<0.025 for the first column if using 1000 shuffled (25/1000 = 0.025)
     
     %% Final manuscript plot: Fig. 3
     

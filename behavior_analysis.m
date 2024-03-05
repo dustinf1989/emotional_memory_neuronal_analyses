@@ -12,7 +12,7 @@
 %%%
 %%% Originally written by Manuela Costa, adapted by Dustin Fetterhoff
 
-clearvars; close all; clc
+clearvars; close all; clc;
 
 % Change this path to the data directory - Nothing else should need to be changed
 data_folder = 'C:/Users/drdus/emotional_memory_neuronal_data/';
