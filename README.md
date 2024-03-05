@@ -8,8 +8,8 @@ In each script, you only need to change the code_folder and data_folder variable
 
 Run the *behavior_analysis.m* script to generate the behavioral statistics and Tables S1 and S2.
 
-Run the script 'spike_analysis_final.m' to generate all example neuron plots (Fig. 1), Fig. 2, SFig. 1, SFig. 2 and SFig. 3. 
+Run the script *spike_analysis_final.m* to generate all example neuron plots (Fig. 1), Fig. 2, SFig. 1, SFig. 2 and SFig. 3. 
 
-Run 'iapsEncoding_dpcaPipeline_final.m' to generate Fig. 3 and the encoding (top) part of SFig. 4
+Run *iapsEncoding_dpcaPipeline_final.m* to generate Fig. 3 and the encoding (top) part of SFig. 4
 
-Run 'iapsRecognition_dpcaPipeline_final.m' to generate Fig. 4 and the recognition (bottom) part of SFig. 4.
+Run *iapsRecognition_dpcaPipeline_final.m* to generate Fig. 4 and the recognition (bottom) part of SFig. 4.
